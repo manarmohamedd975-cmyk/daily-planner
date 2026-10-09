@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#07152f">
+<title>مخططي اليومي</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
+:root{
+  --bg:#06132b;--panel:#0a1c3a;--panel2:#0d2347;--line:#1b3b70;
+  --blue:#2874ff;--cyan:#42d9ff;--text:#f3f7ff;--muted:#9fb2d2;
+  --green:#18d49b;--yellow:#ffc64d;--red:#ff5d6c;--radius:18px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Cairo',Tahoma,sans-serif;background:radial-gradient(ellipse at top,#122c63 0,#071631 48%,#040d20 100%);color:var(--text);min-height:100vh}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{max-width:1150px;margin:auto;padding:22px 16px 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:60px;height:60px;border-radius:18px;display:grid;place-items:center;font-size:30px;background:linear-gradient(145deg,#087bff,#18265b);border:1px solid #4d8aff;box-shadow:0 0 25px #1268ff45}
+h1{font-size:clamp(23px,4vw,34px);margin:0;font-weight:800}
+.subtitle{color:#b8c9e7;margin:2px 0 0;font-size:14px}
+.header-date{text-align:left;color:var(--muted);font-size:13px}
+.header-date strong{display:block;color:#fff;font-size:18px}
+.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.85fr);gap:18px;align-items:start}
+.panel{background:linear-gradient(160deg,#0c2042f2,#07172ff5);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 12px 35px #0002}
+.panel-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;font-size:19px}
+.panel-title small{color:var(--muted);font-size:12px;font-weight:400}
+.clock{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(110deg,#102c59,#0a1a36);border:1px solid #1c3e72;border-radius:15px;padding:14px 17px;margin-bottom:15px}
+.clock .date{font-size:12px;color:var(--muted)}
+.clock .time{font-size:27px;font-weight:800;direction:ltr}
+.clock-icon{font-size:28px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.filter{border:1px solid #24436f;background:#0b1c38;color:#b9c9e4;border-radius:10px;padding:7px 14px;font-size:13px}
+.filter.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.task-list{display:grid;gap:10px}
+.task{display:grid;grid-template-columns:24px minmax(0,1fr) auto;align-items:center;gap:10px;padding:13px;background:#0b1d3a;border:1px solid #17365f;border-radius:14px;transition:.2s}
+.task:hover{border-color:#3475c8;transform:translateY(-1px)}
+.task.done{opacity:.68}
+.task.done .task-name{text-decoration:line-through;color:#9aabc6}
+.check{width:19px;height:19px;border:2px solid #7395c9;border-radius:50%;background:transparent;display:grid;place-items:center;color:#06142b;font-size:12px;padding:0}
+.task.done .check{background:var(--green);border-color:var(--green)}
+.task-name{font-weight:700;font-size:14px;overflow-wrap:anywhere}
+.task-meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:11px;margin-top:4px}
+.badge{border-radius:7px;padding:2px 7px;font-size:10px;font-weight:700}
+.high{background:#4a2439;color:#ff9aa4}.medium{background:#4c3b1d;color:#ffd76f}.low{background:#123e3b;color:#60e7bd}
+.task-actions{display:flex;gap:5px}
+.icon-btn{border:1px solid #23436e;background:#10274a;color:#c9d8ef;border-radius:8px;padding:5px 8px;font-size:12px}
+.icon-btn:hover{background:#1a3b6d}
+.empty{text-align:center;color:var(--muted);padding:32px 12px;border:1px dashed #24436b;border-radius:14px}
+.empty span{display:block;font-size:32px;margin-bottom:6px}
+.add-btn,.primary{border:0;border-radius:12px;color:#fff;font-weight:700;background:linear-gradient(100deg,#1765f5,#3186ff);padding:12px 16px;box-shadow:0 6px 18px #1268ff2b}
+.add-btn{width:100%;margin-top:14px;font-size:15px}
+.add-btn:hover,.primary:hover{filter:brightness(1.12)}
+.side{display:grid;gap:18px}
+.stats-ring-wrap{display:flex;align-items:center;justify-content:center;padding:8px 0 18px}
+.ring{width:145px;height:145px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--green) var(--progress,0%),#233a5d 0);position:relative}
+.ring:before{content:"";position:absolute;inset:11px;border-radius:50%;background:#0a1b37}
+.ring-content{position:relative;text-align:center}
+.ring-content strong{font-size:28px;display:block}
+.ring-content span{font-size:11px;color:var(--muted)}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.stat{background:#0b1d3a;border:1px solid #17365f;border-radius:13px;padding:12px}
+.stat-top{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:12px}
+.stat strong{display:block;font-size:24px;margin-top:4px}
+.stat .green{color:var(--green)}.stat .red{color:var(--red)}.stat .gold{color:var(--yellow)}.stat .blue{color:#70a9ff}
+.priority-bars{margin-top:16px;border-top:1px solid #1b365e;padding-top:13px}
+.priority-bars h3{font-size:14px;margin:0 0 12px}
+.bar-row{display:grid;grid-template-columns:65px 1fr 20px;gap:8px;align-items:center;margin:10px 0;font-size:11px;color:#bdcbe2}
+.bar{height:8px;background:#142c50;border-radius:20px;overflow:hidden}
+.bar span{height:100%;display:block;border-radius:20px}
+.bar .b-high{background:var(--red)}.bar .b-medium{background:var(--yellow)}.bar .b-low{background:#12b88d}
+.quick-list{display:grid;gap:10px}
+.quick{display:flex;gap:10px;align-items:center;background:#0b1d3a;border-radius:12px;padding:11px;color:#d6e3f7;font-size:13px}
+.quick-icon{width:35px;height:35px;border-radius:10px;display:grid;place-items:center;background:#102d5a;font-size:18px}
+footer{text-align:center;color:#748caf;font-size:11px;padding:22px 0 0}
+.modal-backdrop{position:fixed;inset:0;background:#020916c9;display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+.modal-backdrop.show{display:flex}
+.modal{width:min(100%,460px);background:#0a1c39;border:1px solid #2b4d80;border-radius:20px;padding:22px;box-shadow:0 20px 80px #0008}
+.modal h2{margin:0 0 18px;font-size:21px}
+.form-group{margin-bottom:13px}
+label{display:block;color:#c4d3eb;font-size:12px;margin-bottom:6px}
+input,select{width:100%;border:1px solid #284773;background:#07162f;color:#fff;border-radius:10px;padding:11px 12px;outline:none}
+input:focus,select:focus{border-color:#428aff;box-shadow:0 0 0 3px #2874ff22}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-actions{display:flex;gap:9px;margin-top:18px}
+.modal-actions button{flex:1}
+.secondary{border:1px solid #315078;background:#102342;color:#d3e1f6;border-radius:12px;padding:11px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#123b39;border:1px solid #1c9c7a;color:#caffee;border-radius:12px;padding:10px 16px;font-size:13px;transition:.25s;z-index:20}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:780px){.layout{grid-template-columns:1fr}.side{grid-template-columns:1fr 1fr}.side .panel:first-child{grid-column:1/-1}.app{padding:15px 12px 30px}.panel{padding:15px}}
+@media(max-width:480px){header{align-items:flex-start}.logo{width:49px;height:49px;font-size:25px}.header-date{font-size:11px}.header-date strong{font-size:14px}.side{grid-template-columns:1fr}.side .panel:first-child{grid-column:auto}.task{grid-template-columns:22px minmax(0,1fr)}.task-actions{grid-column:2;justify-content:flex-start}.form-row{grid-template-columns:1fr}.clock .time{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">✓</div>
+      <div><h1>مخططي اليومي</h1><p class="subtitle">نظّمي مهامك، وحققي أهدافك خطوة بخطوة ✨</p></div>
+    </div>
+    <div class="header-date"><span>📅 النهارده</span><strong id="headerDate">—</strong></div>
+  </header>
+
+  <main class="layout">
+    <section class="panel">
+      <h2 class="panel-title">🗓️ مهام اليوم <small id="taskCount">0 مهام</small></h2>
+      <div class="clock">
+        <div><div class="date" id="fullDate">تابعي يومك أول بأول</div><div class="time" id="clock">00:00</div></div>
+        <div class="clock-icon">⏱️</div>
+      </div>
+      <div class="filters" role="tablist" aria-label="تصفية المهام">
+        <button class="filter active" data-filter="all">الكل</button>
+        <button class="filter" data-filter="open">غير المكتملة</button>
+        <button class="filter" data-filter="done">المكتملة</button>
+      </div>
+      <div id="taskList" class="task-list"></div>
+      <button class="add-btn" id="openAdd">＋ إضافة مهمة جديدة</button>
+    </section>
+
+    <aside class="side">
+      <section class="panel">
+        <h2 class="panel-title">📊 الإحصائيات</h2>
+        <div class="stats-ring-wrap">
+          <div class="ring" id="ring"><div class="ring-content"><strong id="percent">0%</strong><span>من المهام مكتملة</span></div></div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><div class="stat-top">إجمالي المهام <span>▦</span></div><strong class="blue" id="totalStat">0</strong></div>
+          <div class="stat"><div class="stat-top">مكتملة <span>✓</span></div><strong class="green" id="doneStat">0</strong></div>
+          <div class="stat"><div class="stat-top">غير مكتملة <span>○</span></div><strong class="red" id="openStat">0</strong></div>
+          <div class="stat"><div class="stat-top">متأخرة <span>◷</span></div><strong class="gold" id="lateStat">0</strong></div>
+        </div>
+        <div class="priority-bars">
+          <h3>توزيع الأولويات</h3>
+          <div class="bar-row"><span class="badge high">عالية</span><div class="bar"><span class="b-high" id="highBar" style="width:0%"></span></div><b id="highCount">0</b></div>
+          <div class="bar-row"><span class="badge medium">متوسطة</span><div class="bar"><span class="b-medium" id="mediumBar" style="width:0%"></span></div><b id="mediumCount">0</b></div>
+          <div class="bar-row"><span class="badge low">منخفضة</span><div class="bar"><span class="b-low" id="lowBar" style="width:0%"></span></div><b id="lowCount">0</b></div>
+        </div>
+      </section>
+      <section class="panel">
+        <h2 class="panel-title">💡 تذكير لطيف</h2>
+        <div class="quick-list">
+          <div class="quick"><div class="quick-icon">🎯</div><div>ابدئي بالأهم، مش لازم تعملي كل حاجة مرة واحدة.</div></div>
+          <div class="quick"><div class="quick-icon">🌿</div><div>خدي استراحة صغيرة بين كل مهمة والتانية.</div></div>
+          <div class="quick"><div class="quick-icon">💖</div><div>كل خطوة صغيرة بتقرّبك من هدفك.</div></div>
+        </div>
+      </section>
+    </aside>
+  </main>
+  <footer>بيانات مهامك بتتحفظ على نفس الجهاز تلقائيًا 💙</footer>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h2 id="modalTitle">إضافة مهمة</h2>
+    <form id="taskForm">
+      <input type="hidden" id="taskId">
+      <div class="form-group"><label for="taskName">اسم المهمة</label><input id="taskName" maxlength="120" placeholder="مثال: مذاكرة اللغة الإنجليزية" required></div>
+      <div class="form-row">
+        <div class="form-group"><label for="priority">الأولوية</label><select id="priority"><option value="high">عالية</option><option value="medium" selected>متوسطة</option><option value="low">منخفضة</option></select></div>
+        <div class="form-group"><label for="taskTime">الموعد (اختياري)</label><input id="taskTime" type="time"></div>
+      </div>
+      <div class="form-group"><label for="taskDate">التاريخ</label><input id="taskDate" type="date" required></div>
+      <div class="modal-actions"><button class="primary" type="submit" id="saveTask">حفظ المهمة</button><button class="secondary" type="button" id="cancelModal">إلغاء</button></div>
+    </form>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const STORAGE_KEY = 'dailyPlannerTasks_v1';
+  let tasks = [];
+  let currentFilter = 'all';
+  let toastTimer;
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    tasks = Array.isArray(saved) ? saved : [];
+  } catch (_) { tasks = []; }
+
+  const todayISO = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  };
+  const escapeHTML = value => String(value).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[ch]);
+  const priorityLabel = p => ({high:'عالية',medium:'متوسطة',low:'منخفضة'})[p] || 'متوسطة';
+  const priorityClass = p => ({high:'high',medium:'medium',low:'low'})[p] || 'medium';
+  const save = () => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
+    catch (_) { showToast('تعذر حفظ البيانات على هذا المتصفح'); }
+  };
+  function showToast(message) {
+    $('toast').textContent = message;
+    $('toast').classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => $('toast').classList.remove('show'), 2300);
+  }
+  function formatDate(dateString) {
+    if (!dateString) return '';
+    const d = new Date(dateString + 'T12:00:00');
+    return d.toLocaleDateString('ar-EG',{day:'numeric',month:'short'});
+  }
+  function render() {
+    const list = $('taskList');
+    let visible = tasks.filter(t => currentFilter === 'all' || (currentFilter === 'open' && !t.done) || (currentFilter === 'done' && t.done));
+    visible.sort((a,b) => Number(a.done)-Number(b.done) || (a.date||'').localeCompare(b.date||'') || (a.time||'').localeCompare(b.time||''));
+    $('taskCount').textContent = `${visible.length} ${visible.length === 1 ? 'مهمة' : 'مهام'}`;
+    if (!visible.length) {
+      list.innerHTML = `<div class="empty"><span>${currentFilter==='done'?'🌟':'📝'}</span><strong>${currentFilter==='done'?'لسه مفيش مهام مكتملة':'مفيش مهام هنا دلوقتي'}</strong><div style="font-size:12px;margin-top:5px">اضغطي على «إضافة مهمة جديدة» وابدئي تنظيم يومك</div></div>`;
+    } else {
+      list.innerHTML = visible.map(t => `
+        <article class="task ${t.done?'done':''}">
+          <button class="check" data-action="toggle" data-id="${escapeHTML(t.id)}" aria-label="${t.done?'إلغاء الإكمال':'إكمال المهمة'}">${t.done?'✓':''}</button>
+          <div>
+            <div class="task-name">${escapeHTML(t.name)}</div>
+            <div class="task-meta"><span class="badge ${priorityClass(t.priority)}">${priorityLabel(t.priority)}</span><span>📅 ${formatDate(t.date)}</span>${t.time?`<span>🕒 ${escapeHTML(t.time)}</span>`:''}</div>
+          </div>
+          <div class="task-actions"><button class="icon-btn" data-action="edit" data-id="${escapeHTML(t.id)}" aria-label="تعديل">✎</button><button class="icon-btn" data-action="delete" data-id="${escapeHTML(t.id)}" aria-label="حذف">✕</button></div>
+        </article>`).join('');
+    }
+    renderStats();
+  }
+  function renderStats() {
+    const total = tasks.length, done = tasks.filter(t=>t.done).length, open = total-done;
+    const late = tasks.filter(t=>!t.done && t.date && t.date < todayISO()).length;
+    const pct = total ? Math.round(done/total*100) : 0;
+    $('percent').textContent = pct+'%';
+    $('ring').style.setProperty('--progress',pct+'%');
+    $('totalStat').textContent = total; $('doneStat').textContent = done;
+    $('openStat').textContent = open; $('lateStat').textContent = late;
+    [['high', $('highBar'), $('highCount')],['medium',$('mediumBar'),$('mediumCount')],['low',$('lowBar'),$('lowCount')]].forEach(([p,bar,count])=>{
+      const n = tasks.filter(t=>t.priority===p).length;
+      count.textContent=n; bar.style.width=(total?n/total*100:0)+'%';
+    });
+  }
+  function openModal(task) {
+    $('taskForm').reset();
+    $('taskId').value = task ? task.id : '';
+    $('taskName').value = task ? task.name : '';
+    $('priority').value = task ? task.priority : 'medium';
+    $('taskTime').value = task ? (task.time||'') : '';
+    $('taskDate').value = task ? (task.date||todayISO()) : todayISO();
+    $('modalTitle').textContent = task ? 'تعديل المهمة' : 'إضافة مهمة جديدة';
+    $('saveTask').textContent = task ? 'حفظ التعديلات' : 'حفظ المهمة';
+    $('modalBackdrop').classList.add('show');
+    setTimeout(()=>$('taskName').focus(),80);
+  }
+  function closeModal() { $('modalBackdrop').classList.remove('show'); }
+  $('openAdd').addEventListener('click',()=>openModal(null));
+  $('cancelModal').addEventListener('click',closeModal);
+  $('modalBackdrop').addEventListener('click',e=>{if(e.target===$('modalBackdrop'))closeModal();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+  $('taskForm').addEventListener('submit',e=>{
+    e.preventDefault();
+    const name = $('taskName').value.trim();
+    if (!name) { $('taskName').focus(); return; }
+    const id = $('taskId').value;
+    const data = {name,priority:$('priority').value,date:$('taskDate').value||todayISO(),time:$('taskTime').value};
+    if (id) {
+      const index = tasks.findIndex(t=>t.id===id);
+      if (index>=0) tasks[index] = {...tasks[index],...data};
+      showToast('تم تعديل المهمة بنجاح ✨');
+    } else {
+      tasks.push({id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),...data,done:false,createdAt:Date.now()});
+      showToast('اتضافت المهمة بنجاح 💙');
+    }
+    save(); render(); closeModal();
+  });
+  $('taskList').addEventListener('click',e=>{
+    const button=e.target.closest('button[data-action]');
+    if(!button)return;
+    const task=tasks.find(t=>t.id===button.dataset.id);
+    if(!task)return;
+    const action=button.dataset.action;
+    if(action==='toggle'){task.done=!task.done;save();render();showToast(task.done?'برافو عليكي! المهمة خلصت 🎉':'تمت إعادة فتح المهمة');}
+    if(action==='edit')openModal(task);
+    if(action==='delete'){
+      if(confirm(`متأكدة إنك عايزة تحذفي المهمة «${task.name}»؟`)){
+        tasks=tasks.filter(t=>t.id!==task.id);save();render();showToast('تم حذف المهمة');
+      }
+    }
+  });
+  document.querySelectorAll('.filter').forEach(button=>button.addEventListener('click',()=>{
+    currentFilter=button.dataset.filter;
+    document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b===button));
+    render();
+  }));
+  function updateClock(){
+    const now=new Date();
+    $('clock').textContent=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    $('headerDate').textContent=now.toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long'});
+    $('fullDate').textContent=now.toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  }
+  updateClock();setInterval(updateClock,1000);
+  render();
+})();
+</script>
+</body>
+</html>
