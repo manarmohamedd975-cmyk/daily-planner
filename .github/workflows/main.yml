@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مخططي اليومي 🌸</title>
+
+<style>
+:root {
+  --bg: #f8f1e9;
+  --card: #ffffff;
+  --text: #29232a;
+  --pink: #e9b3c9;
+  --pink-dark: #bc668c;
+  --beige: #ead9c6;
+  --border: #eadfe4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Tahoma, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: 0.3s;
+}
+
+body.dark {
+  --bg: #19171c;
+  --card: #29252d;
+  --text: #ffffff;
+  --pink: #70465a;
+  --pink-dark: #efb1ce;
+  --beige: #51433c;
+  --border: #443943;
+}
+
+header {
+  background: #29232a;
+  color: white;
+  padding: 25px 15px;
+  text-align: center;
+  border-radius: 0 0 25px 25px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 30px;
+}
+
+header p {
+  color: #ead9e1;
+}
+
+.container {
+  max-width: 900px;
+  margin: 25px auto;
+  padding: 0 15px;
+}
+
+button, input, textarea, select {
+  font-family: inherit;
+  font-size: 14px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: var(--pink);
+  color: var(--text);
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+.card {
+  background: var(--card);
+  padding: 18px;
+  margin-bottom: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: 0 5px 18px #00000008;
+}
+
+.card h2 {
+  margin-top: 0;
+  font-size: 20px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.stat {
+  text-align: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 15px 5px;
+}
+
+.stat strong {
+  display: block;
+  font-size: 25px;
+  margin-top: 8px;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.row button {
+  white-space: nowrap;
+}
+
+.progress {
+  height: 9px;
+  background: var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.progress div {
+  height: 100%;
+  width: 0;
+  background: var(--pink-dark);
+  transition: width 0.3s;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  overflow-wrap: anywhere;
+}
+
+li:last-child {
+  border-bottom: none;
+}
+
+li span {
+  flex: 1;
+}
+
+li.done span {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+
+li input[type="checkbox"] {
+  width: 19px;
+  height: 19px;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--pink-dark);
+}
+
+.delete {
+  background: transparent;
+  color: #c94c68;
+  padding: 5px;
+}
+
+.empty {
+  text-align: center;
+  color: #999;
+  padding: 15px;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+  font-size: 12px;
+}
+
+@media(max-width: 500px) {
+  header h1 {
+    font-size: 25px;
+  }
+
+  .stats {
+    gap: 6px;
+  }
+
+  .stat {
+    padding: 12px 3px;
+    font-size: 12px;
+  }
+
+  .stat strong {
+    font-size: 22px;
+  }
+
+  .row {
+    flex-wrap: wrap;
+  }
+
+  .row button {
+    margin-bottom: 8px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🌸 مخططي اليومي</h1>
+  <p>نظمي يومك وحققي أهدافك خطوة بخطوة</p>
+  <div id="today"></div>
+</header>
+
+<main class="container">
+
+  <div style="text-align:left;margin-bottom:12px">
+    <button onclick="toggleDark()" id="darkButton">
+      🌙 الوضع الليلي
+    </button>
+  </div>
+
+  <section class="stats">
+    <div class="stat">
+      إجمالي المهام
+      <strong id="total">0</strong>
+    </div>
+
+    <div class="stat">
+      المهام المكتملة
+      <strong id="completed">0</strong>
+    </div>
+
+    <div class="stat">
+      نسبة الإنجاز
+      <strong id="percentage">0%</strong>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>📝 مهامي اليومية</h2>
+
+    <form id="taskForm">
+      <input
+        id="taskInput"
+        placeholder="اكتبي المهمة الجديدة..."
+        maxlength="180"
+        required
+      >
+
+      <div class="row">
+        <input type="date" id="taskDate">
+        <input type="time" id="taskTime">
+      </div>
+
+      <div class="row">
+        <select id="priority">
+          <option value="عادية">أولوية عادية</option>
+          <option value="مهمة">مهمة</option>
+          <option value="عاجلة">عاجلة</option>
+        </select>
+
+        <button type="submit">＋ إضافة مهمة</button>
+      </div>
+    </form>
+
+    <ul id="taskList"></ul>
+  </section>
+
+  <section class="card">
+    <h2>🎯 أهدافي</h2>
+
+    <form id="goalForm">
+      <div class="row">
+        <input
+          id="goalInput"
+          placeholder="اكتبي هدفك..."
+          maxlength="180"
+          required
+        >
+        <button type="submit">إضافة</button>
+      </div>
+    </form>
+
+    <ul id="goalList"></ul>
+  </section>
+
+  <section class="card">
+    <h2>🌱 عاداتي اليومية</h2>
+
+    <form id="habitForm">
+      <div class="row">
+        <input
+          id="habitInput"
+          placeholder="مثلاً: قراءة القرآن"
+          maxlength="120"
+          required
+        >
+        <button type="submit">إضافة</button>
+      </div>
+    </form>
+
+    <ul id="habitList"></ul>
+  </section>
+
+  <section class="card">
+    <h2>💌 ملاحظاتي</h2>
+
+    <form id="noteForm">
+      <textarea
+        id="noteInput"
+        placeholder="اكتبي أفكارك وملاحظاتك..."
+        rows="3"
+        maxlength="2000"
+        required
+      ></textarea>
+
+      <button type="submit">حفظ الملاحظة</button>
+    </form>
+
+    <ul id="noteList"></ul>
+  </section>
+
+  <section class="card">
+    <h2>🗑️ إدارة البيانات</h2>
+    <button onclick="clearAll()">مسح كل البيانات</button>
+  </section>
+
+</main>
+
+<footer>
+  مخططي اليومي 🌸 | كل يوم فرصة جديدة للإنجاز
+</footer>
+
+<script>
+const KEY = "dailyPlannerApp_v1";
+
+let data = {
+  tasks: [],
+  goals: [],
+  habits: [],
+  notes: [],
+  dark: false
+};
+
+try {
+  const saved = JSON.parse(localStorage.getItem(KEY));
+
+  if (saved && typeof saved === "object") {
+    data = { ...data, ...saved };
+  }
+} catch (error) {
+  console.log("تعذر تحميل البيانات المحفوظة");
+}
+
+function save() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(data));
+  } catch (error) {
+    alert("تعذر حفظ البيانات على هذا الجهاز.");
+  }
+
+  render();
+}
+
+function id() {
+  return Date.now().toString(36) +
+    Math.random().toString(36).slice(2, 8);
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function localDate() {
+  const d = new Date();
+
+  return d.getFullYear() + "-" +
+    String(d.getMonth() + 1).padStart(2, "0") + "-" +
+    String(d.getDate()).padStart(2, "0");
+}
+
+document.getElementById("today").textContent =
+  new Intl.DateTimeFormat("ar-EG", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  }).format(new Date());
+
+document.getElementById("taskDate").value = localDate();
+
+document.getElementById("taskForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const title = document.getElementById("taskInput").value.trim();
+
+  if (!title) return;
+
+  data.tasks.push({
+    id: id(),
+    title,
+    date: document.getElementById("taskDate").value,
+    time: document.getElementById("taskTime").value,
+    priority: document.getElementById("priority").value,
+    done: false
+  });
+
+  event.target.reset();
+  document.getElementById("taskDate").value = localDate();
+
+  save();
+});
+
+document.getElementById("goalForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const input = document.getElementById("goalInput");
+  const title = input.value.trim();
+
+  if (!title) return;
+
+  data.goals.push({
+    id: id(),
+    title,
+    done: false
+  });
+
+  input.value = "";
+  save();
+});
+
+document.getElementById("habitForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const input = document.getElementById("habitInput");
+  const title = input.value.trim();
+
+  if (!title) return;
+
+  data.habits.push({
+    id: id(),
+    title,
+    done: false
+  });
+
+  input.value = "";
+  save();
+});
+
+document.getElementById("noteForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const input = document.getElementById("noteInput");
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  data.notes.unshift({
+    id: id(),
+    text,
+    date: new Date().toLocaleString("ar-EG")
+  });
+
+  input.value = "";
+  save();
+});
+
+function render() {
+  document.body.classList.toggle("dark", data.dark);
+
+  document.getElementById("darkButton").textContent =
+    data.dark ? "☀️ الوضع النهاري" : "🌙 الوضع الليلي";
+
+  const total = data.tasks.length;
+  const completed = data.tasks.filter(task => task.done).length;
+  const percentage = total
+    ? Math.round(completed / total * 100)
+    : 0;
+
+  document.getElementById("total").textContent = total;
+  document.getElementById("completed").textContent = completed;
+  document.getElementById("percentage").textContent =
+    percentage + "%";
+
+  document.getElementById("taskList").innerHTML =
+    data.tasks.length
+      ? data.tasks.map(task => `
+        <li class="${task.done ? "done" : ""}">
+          <input
+            type="checkbox"
+            ${task.done ? "checked" : ""}
+            onchange="toggleTask('${task.id}')"
+            aria-label="اكتمال المهمة"
+          >
+
+          <span>
+            ${escapeHTML(task.title)}
+            <br>
+            <small>
+              ${escapeHTML(task.priority)}
+              ${task.date ? " • " + escapeHTML(task.date) : ""}
+              ${task.time ? " • " + escapeHTML(task.time) : ""}
+            </small>
+          </span>
+
+          <button
+            class="delete"
+            onclick="editTask('${task.id}')"
+            title="تعديل"
+          >✏️</button>
+
+          <button
+            class="delete"
+            onclick="deleteTask('${task.id}')"
+            title="حذف"
+          >🗑️</button>
+        </li>
+      `).join("")
+      : '<li class="empty">لسه مفيش مهام، ابدئي بإضافة مهمة 💗</li>';
+
+  document.getElementById("goalList").innerHTML =
+    data.goals.length
+      ? data.goals.map(goal => `
+        <li class="${goal.done ? "done" : ""}">
+          <input
+            type="checkbox"
+            ${goal.done ? "checked" : ""}
+            onchange="toggleItem('goals','${goal.id}')"
+          >
+
+          <span>${escapeHTML(goal.title)}</span>
+
+          <button
+            class="delete"
+            onclick="deleteItem('goals','${goal.id}')"
+          >🗑️</button>
+        </li>
+      `).join("")
+      : '<li class="empty">ضيفي أول هدف ليكي ✨</li>';
+
+  document.getElementById("habitList").innerHTML =
+    data.habits.length
+      ? data.habits.map(habit => `
+        <li class="${habit.done ? "done" : ""}">
+          <input
+            type="checkbox"
+            ${habit.done ? "checked" : ""}
+            onchange="toggleItem('habits','${habit.id}')"
+          >
+
+          <span>${escapeHTML(habit.title)}</span>
+
+          <button
+            class="delete"
+            onclick="deleteItem('habits','${habit.id}')"
+          >🗑️</button>
+        </li>
+      `).join("")
+      : '<li class="empty">ضيفي عادة جديدة 🌱</li>';
+
+  document.getElementById("noteList").innerHTML =
+    data.notes.length
+      ? data.notes.map(note => `
+        <li>
+          <span>
+            ${escapeHTML(note.text)}
+            <br>
+            <small>${escapeHTML(note.date)}</small>
+          </span>
+
+          <button
+            class="delete"
+            onclick="deleteItem('notes','${note.id}')"
+          >🗑️</button>
+        </li>
+      `).join("")
+      : '<li class="empty">ملاحظاتك هتظهر هنا 💌</li>';
+}
+
+function toggleTask(taskId) {
+  const task = data.tasks.find(item => item.id === taskId);
+
+  if (task) task.done = !task.done;
+
+  save();
+}
+
+function editTask(taskId) {
+  const task = data.tasks.find(item => item.id === taskId);
+
+  if (!task) return;
+
+  const title = prompt("اكتبي اسم المهمة الجديد:", task.title);
+
+  if (title !== null && title.trim()) {
+    task.title = title.trim();
+    save();
+  }
+}
+
+function deleteTask(taskId) {
+  if (!confirm("متأكدة إنك عايزة تحذفي المهمة؟")) return;
+
+  data.tasks = data.tasks.filter(task => task.id !== taskId);
+
+  save();
+}
+
+function toggleItem(type, itemId) {
+  const item = data[type].find(entry => entry.id === itemId);
+
+  if (item) item.done = !item.done;
+
+  save();
+}
+
+function deleteItem(type, itemId) {
+  data[type] = data[type].filter(item => item.id !== itemId);
+
+  save();
+}
+
+function toggleDark() {
+  data.dark = !data.dark;
+  save();
+}
+
+function clearAll() {
+  if (!confirm("هل أنتِ متأكدة من مسح جميع المهام والأهداف والعادات والملاحظات؟")) {
+    return;
+  }
+
+  data = {
+    tasks: [],
+    goals: [],
+    habits: [],
+    notes: [],
+    dark: data.dark
+  };
+
+  save();
+}
+
+render();
+</script>
+
+</body>
+</html>
